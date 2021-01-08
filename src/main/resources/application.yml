@@ -1,0 +1,9 @@
+spring:
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    show-sql: true
+    generate-ddl: false
+    hibernate:
+      ddl-auto: update
+  profiles:
+    active: develop
