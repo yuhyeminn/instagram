@@ -23,4 +23,5 @@ public interface UserService {
 
     void completeUserAuth(Long userId);
 
+    void updatePassword(Long userId, String param);
 }

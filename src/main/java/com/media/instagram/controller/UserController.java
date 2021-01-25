@@ -71,7 +71,7 @@ public class UserController {
      * @return
      */
     @PostMapping("/{userId}/emailconfirm")
-    public ResponseEntity emailConfirm(@PathVariable Long userId, @RequestBody String authKey){
+    public ResponseEntity emailConfirm(@PathVariable Long userId, @RequestParam String authKey){
         try{
 
             Map<String, Object> param = new HashMap<>();
@@ -137,4 +137,23 @@ public class UserController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
+    /**
+     * 비밀번호 변경 메서드
+     * @param userId
+     * @param password
+     * @return
+     */
+    @PutMapping("/{userId}/password")
+    public ResponseEntity updateUserInform(@PathVariable Long userId, @RequestParam String password){
+        try{
+
+            // FIXME : 파라미터로 넘어온 password에 대한 유효성 검사 & 보안문제
+            userService.updatePassword(userId, password);
+
+            return new ResponseEntity(HttpStatus.OK);
+
+        }catch(Exception e){
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

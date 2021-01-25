@@ -188,4 +188,17 @@ public class UserServiceImpl implements UserService {
         userRepository.save(modelMapper.map(userDTO, User.class));
     }
 
+    @Override
+    public void updatePassword(Long userId, String password) {
+        User user = userRepository.getOne(userId);
+        UserDTO userDTO = modelMapper.map(user, UserDTO.class);
+        // 변경된 비밀번호 셋팅
+        String encodedPassword = bCryptPasswordEncoder.encode(password);
+        userDTO.setPassword(encodedPassword);
+        user = userRepository.save(modelMapper.map(userDTO, User.class));
+        if(user == null){
+            throw  new UserException("failed change password");
+        }
+    }
+
 }
