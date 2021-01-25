@@ -124,4 +124,17 @@ public class UserController {
         }
     }
 
+    /**
+     * 로그아웃 메서드
+     * @param session
+     * @return
+     */
+    @GetMapping("/logout")
+    public ResponseEntity userLogout(HttpSession session){
+        if(session != null) {
+            session.removeAttribute("login_user");
+        }
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
 }
