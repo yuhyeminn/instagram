@@ -35,4 +35,13 @@ public class User {
     @Column(name = "user_type")
     @Enumerated(EnumType.STRING)
     UserType userType;
+
+    @Column(name = "auth_key")
+    String authKey;
+
+    @Column(name = "auth_status")
+    @Enumerated(EnumType.STRING)
+    UserAuthStatus authStatus;
+
+
 }

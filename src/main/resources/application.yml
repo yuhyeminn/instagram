@@ -6,4 +6,4 @@ spring:
     hibernate:
       ddl-auto: update
   profiles:
-    active: develop
+    active: develop,smtp
