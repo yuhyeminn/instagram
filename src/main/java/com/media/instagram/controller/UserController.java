@@ -46,15 +46,18 @@ public class UserController {
             UserDTO enrolledUser = null;
 
             // 이메일, 사용자 닉네임 중복일 경우
+            // TODO : 메소드 분리할 것..!
             if(!userService.availableUser(userDTO)){
                 return new ResponseEntity(HttpStatus.BAD_REQUEST);
             }
             // 사용자 정보 db 등록 및 profile 생성
             enrolledUser = userService.userEnroll(userDTO);
-            // 인증키 발급 및 인증 요청 이메일 발송
-            userService.signUpEmailSend(enrolledUser);
-            // 인증키 컬럼 db 저장
-            userService.userInformUpdate(enrolledUser);
+
+            // -------------email 인증
+//            // 인증키 발급 및 인증 요청 이메일 발송
+//            userService.signUpEmailSend(enrolledUser);
+//            // 인증키 컬럼 db 저장
+//            userService.userInformUpdate(enrolledUser);
 
             return new ResponseEntity(HttpStatus.OK);
 
@@ -105,17 +108,16 @@ public class UserController {
         try{
             // 이메일로 일치 회원 검사 (userType - instagram)
             UserDTO login_user = userService.getUserByEmail(userDTO.getEmail());
-            // 등록된 회원 && 인증 완료한 회원
-            if(login_user != null && UserAuthStatus.Y.equals(login_user.getAuthStatus())){
+//            if(login_user != null && UserAuthStatus.Y.equals(login_user.getAuthStatus())){
+            if(login_user != null){
                 //패스워드 비교
                 if(userService.matchPassword(userDTO.getPassword(), login_user.getPassword())){
                     //로그인 성공
                     session.setAttribute("login_user", login_user);
-                    return new ResponseEntity(login_user, HttpStatus.OK);
                 }
             }
-            // 인증 완료되지 않은 회원의 경우
-            return new ResponseEntity("Unauthenticated user", HttpStatus.BAD_REQUEST);
+
+            return new ResponseEntity(login_user, HttpStatus.OK);
 
         }catch (Exception e){
             e.printStackTrace();
@@ -156,4 +158,6 @@ public class UserController {
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    
+    // TODO: 비밀번호 찾기
 }
