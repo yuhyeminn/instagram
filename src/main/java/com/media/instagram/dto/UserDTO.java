@@ -1,12 +1,10 @@
 package com.media.instagram.dto;
 
+import com.media.instagram.domain.Profile;
 import com.media.instagram.domain.UserAuthStatus;
 import com.media.instagram.domain.UserType;
 import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
@@ -44,6 +42,8 @@ public class UserDTO {
     private String authKey;
 
     private UserAuthStatus authStatus;
+
+    private Profile profile;
 
     /**
      * 이메일 인증을 위한 임의의 토큰 생성

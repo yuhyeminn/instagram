@@ -49,7 +49,7 @@ public class UserController {
             if(!userService.availableUser(userDTO)){
                 return new ResponseEntity(HttpStatus.BAD_REQUEST);
             }
-            // 사용자 정보 db 등록
+            // 사용자 정보 db 등록 및 profile 생성
             enrolledUser = userService.userEnroll(userDTO);
             // 인증키 발급 및 인증 요청 이메일 발송
             userService.signUpEmailSend(enrolledUser);

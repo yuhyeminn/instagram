@@ -1,24 +1,21 @@
 package com.media.instagram.serviceimpl;
 
-import com.media.instagram.domain.User;
-import com.media.instagram.domain.UserAuthStatus;
-import com.media.instagram.domain.UserType;
+import com.media.instagram.domain.*;
+import com.media.instagram.dto.ProfileDTO;
 import com.media.instagram.dto.UserDTO;
 import com.media.instagram.exception.UserException;
+import com.media.instagram.repository.ProfileRepository;
 import com.media.instagram.repository.UserRepository;
 import com.media.instagram.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMailMessage;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.mail.Message;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import javax.security.auth.message.AuthStatus;
 import javax.transaction.Transactional;
 import java.util.Map;
 
@@ -28,6 +25,7 @@ import java.util.Map;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final ProfileRepository profileRepository;
     private final ModelMapper modelMapper;
     private final PasswordEncoder bCryptPasswordEncoder;
     private final JavaMailSender javaMailSender;
@@ -40,6 +38,19 @@ public class UserServiceImpl implements UserService {
      */
     public UserDTO userEnroll(UserDTO userDTO) {
         UserDTO result = null;
+
+        // profile 생성
+        ProfileDTO profileDTO = ProfileDTO.builder()
+                .nickname(userDTO.getNickname())
+                .name(userDTO.getName())
+                .profilePrivacy(ProfilePrivacy.PUBLIC)  //공개가 기본
+                .profileStatus(ProfileStatus.DISABLE)   //인증 후 ENABLE로 변경
+                .build();
+        Profile profile = profileRepository.save(modelMapper.map(profileDTO, Profile.class));
+        
+        // 생성된 profile 설정
+        // FIXME : ProfileDTO 타입으로 처리할 수는 없는지..
+        userDTO.setProfile(profile);
         //비밀번호 암호화
         userDTO.setPassword(bCryptPasswordEncoder.encode(userDTO.getPassword()));
         // 사용자 타입 설정. userType = INSTAGRAM
@@ -49,7 +60,6 @@ public class UserServiceImpl implements UserService {
         // User -> UserDTO
         // User 테이블에 추가
         User user = userRepository.save(modelMapper.map(userDTO, User.class));
-
         result = modelMapper.map(user, UserDTO.class);
 
         return result;
@@ -102,8 +112,8 @@ public class UserServiceImpl implements UserService {
             throw new UserException("duplicate email");
         }
 
-        // nickname 중복 검사
-        count = userRepository.countByNickname(userDTO.getNickname());
+        // nickname 중복 검사 (profile테이블)
+        count = profileRepository.countByNickname(userDTO.getNickname());
         if(count > 0){
             result = false;
             // 닉네임 중복. 예외 던지기
@@ -185,6 +195,11 @@ public class UserServiceImpl implements UserService {
         UserDTO userDTO = modelMapper.map(user, UserDTO.class);
         // 컬럼 변경
         userDTO.setAuthStatus(UserAuthStatus.Y);
+        // ProfileStatus ENABLE로 변경
+        Profile p = userDTO.getProfile();
+        p.setProfileStatus(ProfileStatus.ENABLE);
+        userDTO.setProfile(p);
+
         userRepository.save(modelMapper.map(userDTO, User.class));
     }
 

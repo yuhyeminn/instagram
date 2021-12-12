@@ -26,11 +26,9 @@ public class User {
     @Column(name = "user_password")
     String password;
 
-    @Column(name = "user_name")
-    String name;
-
-    @Column(name = "user_nickname", unique=true)
-    String nickname;
+    @OneToOne
+    @JoinColumn(name = "profile_id")
+    Profile profile;
 
     @Column(name = "user_type")
     @Enumerated(EnumType.STRING)
@@ -42,6 +40,4 @@ public class User {
     @Column(name = "auth_status")
     @Enumerated(EnumType.STRING)
     UserAuthStatus authStatus;
-
-
 }
